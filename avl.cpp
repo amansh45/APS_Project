@@ -165,6 +165,16 @@ int retrieveMinAVL(struct avlNode *root) {
 		retrieveMinAVL(root->left);
 }
 
+struct avlNode * search_avl(struct avlNode *root, int val) {
+	if (root == NULL || root->key == val) 
+       return root; 
+     
+    if (root->key < val) 
+       return search_avl(root->right, val); 
+  
+    return search_avl(root->left, val);
+}
+
 void clearAVL(struct avlNode *root) {
 	if(root != NULL) {
 		clearAVL(root->left);

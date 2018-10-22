@@ -134,3 +134,5 @@ int retrieveMinAVL(struct avlNode *);
 struct node *search_binomial_tree(struct node *, int);
 
 bool search_binomial(list <struct node *> &, int);
+
+struct avlNode * search_avl(struct avlNode *, int);

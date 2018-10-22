@@ -270,9 +270,7 @@ void RBTree::inorder(rbNode *x) {
 
 RBTree::RBTree() { root = NULL; }
 
-RBTree::~RBTree() {
-	cout<<"Class Object of rb_tree is destroyed!"<<endl;
-}
+RBTree::~RBTree() {}
 
 rbNode * RBTree::getRoot() { return root; }
 
