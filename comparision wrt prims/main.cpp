@@ -37,7 +37,7 @@ void compare_RB_AVL_BINOMIAL() {
 
 		// creating binomial heap
 		list<struct node *> heap;
-		cout<<times<<endl;
+		cout<<"Comparing with array size of "<<times<<endl;
 		//cout<<endl<<"For array of size: "<<times<<endl;
 		auto start1 = high_resolution_clock::now();
 		for(int j=0;j<times;j++) 
@@ -197,6 +197,7 @@ void compare_RB_AVL_BINOMIAL() {
 
 }
 
+
 void prims_using_binomial_heap(int start_node, int N) {
 	list<struct node *> heap;
 	vector<struct node *> mst(N);
@@ -339,55 +340,144 @@ void prims_using_avl(int start_node, int N) {
 	cout<<cost<<endl;
 }
 
-void prims_using_rb(int start_node, int N) {
-	RBTree tree; 	
-	vector<rbNode *> mst(N);
-	for(int i=0;i<N;i++) {
-		bitmap[i]=false;
-		if(i==start_node)
-			tree.insert(0,i,NULL);
-		else
-			tree.insert((1254*N)-i,i,NULL);
+int *generate_graph(int V, int E) {
+	// int V = random(3, MAX_VERTICES);
+	// int max_edges = (V*(V-1))/2;
+	// int E = random(V, max_edges);
+	vector <int> vertices(V);
+	vector<int> isConnected;
+
+	cout<<"Number of vertices is: "<<V<<endl;
+	cout<<"Number of edges is: "<<E<<endl;
+
+	for(int i=0;i<V;i++)
+		vertices[i] = i;
+
+	for(int i=0;i<V;i++)
+		isConnected.push_back(i);
+
+	int svertex_index = random(0, V-1);
+	int start_vertex = isConnected[svertex_index];
+	isConnected.erase(isConnected.begin()+svertex_index);
+
+	vector <pair<int, int>> edges; 
+
+	int q=0;
+	while(q<V-1) {
+		int next_vertex = random(0,isConnected.size()-1);
+		pair<int, int> p;
+		p.first = start_vertex;
+		p.second = isConnected[next_vertex];
+		edges.push_back(p);
+		start_vertex = isConnected[next_vertex];
+		isConnected.erase(isConnected.begin()+next_vertex);
+		q++;		
 	}
 
-	cout<<"Outside while"<<endl;
-	while(tree.getRoot()!=NULL) {
-		
-		cout<<"Before"<<endl;
-		rbNode *mymin = tree.retrieveMinRB();
-		cout<<"Minimum is: "<<mymin->val<<endl;
-		rbNode test_obj(mymin->val, mymin->vid, mymin->mst_parent);
-		rbNode *min_vertex = &test_obj;
-		cout<<"Extracting: "<<mymin->val<<endl;
-		tree.deleteByVal(mymin->val);
-		cout<<"After extraction: "<<endl;
-		tree.printInOrder();
-		int vertex = min_vertex->vid;
-		bitmap[vertex]=true;
-		mst[vertex]=min_vertex;
-		for(vector<pair<int, int>>::iterator itr=adj_list[vertex].begin(); itr!=adj_list[vertex].end(); itr++) {
-			if(!bitmap[(*itr).first]) { 
-			 	rbNode *pointer = tree.AVLpreOrderSearch((*itr).first);
-			 	int relaxing_id = pointer->vid;
-			 	if((*itr).second < pointer->val) {
-			 		cout<<"Relaxing: "<<relaxing_id<<" old_weight: "<<pointer->val<<" new_weight: "<<(*itr).second<<endl;
-			 		cout<<"Before deletion traversal: "<<endl;
-			 		tree.printInOrder();
-					tree.deleteByVal(pointer->val);
-					cout<<"After deletion traversal: "<<endl;
-					tree.printInOrder();
-					tree.insert((*itr).second, relaxing_id, min_vertex);
-					cout<<"After insertion traversal: "<<endl;
-					tree.printInOrder();
-				}
+	cout<<"Added n number of edges"<<endl;
+	int remaining_edges = E-(V-1);
+
+	for(int i=0;i<remaining_edges;i++) {
+		int a = random(0, V-1);
+		int b = random(0, V-1);
+		bool found_flag;
+		for(int j=0;j<edges.size();j++) {
+			if((edges[j].first == a && edges[j].second ==b) || (edges[j].first == b && edges[j].second == a)) {
+				found_flag = true;
+				break;
 			}
 		}
+		while(b==a || found_flag) {
+			a = random(0, V-1);
+			b = random(0, V-1);
+			found_flag = false;
+			for(int j=0;j<edges.size();j++) {
+				if((edges[j].first == a && edges[j].second ==b) || (edges[j].first == b && edges[j].second == a)) {
+					found_flag = true;
+					break;
+				}
+			}	
+		}
+		
+		pair<int, int> x;
+		x.first = a;
+		x.second = b;
+		edges.push_back(x);
 	}
-	int cost=0;
-	for(int i=0;i<N;i++) {
-		cost+=mst[i]->val;
+
+	cout<<"Graph created successfully"<<endl;
+
+	cout<<"Adding weights randomly"<<endl;
+
+	int max_weight = 3*E;
+	set<int> weights;
+	adj_list.resize(V);
+	bitmap.resize(V);
+	for(int i=0;i<E;i++) {
+		int rand_weight = random(1,max_weight);
+		while(weights.find(rand_weight) != weights.end())
+			rand_weight = random(1, max_weight);
+		pair<int, int> f, s;
+		f.first = edges[i].first;
+		f.second = rand_weight;
+		s.first = edges[i].second;
+		s.second = rand_weight;
+		adj_list[edges[i].first].push_back(s);
+		adj_list[edges[i].second].push_back(f);
+		weights.insert(rand_weight);
 	}
-	cout<<cost<<endl;
+
+	// for(int i=0;i<V;i++) {
+	// 	cout<<i<<"==> ";
+	// 	for(auto itr = adj_list[i].begin(); itr!=adj_list[i].end();itr++) {
+	// 		cout<<"("<<(*itr).first<<", "<<(*itr).second<<")";
+	// 	}
+	// 	cout<<endl;
+	// }
+
+	int start_node = random(0,V-1);
+	int *ptr = (int *) malloc(sizeof(int)*2);
+	ptr[0]=V;
+	ptr[1]=start_node;
+	return ptr;
+}
+
+void compare_wrt_prims() {
+	int edges_arr[17] = {100,500,1000,2000,4000,6000,10000,15000,20000,25000,30000,35000,40000,45000,50000,55000,60000};
+	ofstream binomial_mst, avl_mst;
+	binomial_mst.open("binomial_mst.txt");
+	avl_mst.open("avl_mst.txt");
+	for(int i=0;i<17;i++) {
+		int least_vertex = sqrt(edges_arr[i])+0.5;
+		least_vertex = least_vertex+(least_vertex/2);
+		int max_vertex = edges_arr[i]-(edges_arr[i]/4);
+		int gap = (max_vertex-least_vertex)/20;
+		for(int j=least_vertex;j<=max_vertex;j+=gap) {
+			int *ptr = generate_graph(j,edges_arr[i]);
+
+			cout<<"Vertices: "<<j<<" Edges: "<<edges_arr[i]<<endl;
+
+			auto start_binomial = high_resolution_clock::now();
+			prims_using_binomial_heap(ptr[1], ptr[0]);
+			auto stop_binomial = high_resolution_clock::now(); 
+			auto duration_binomial = duration_cast<microseconds>(stop_binomial - start_binomial); 
+			cout << "Time taken by Binomial Heap : "<<duration_binomial.count()<<" microseconds"<<endl;
+			binomial_mst<<j<<" "<<edges_arr[i]<<" "<<duration_binomial.count()<<endl;
+
+			auto start_avl = high_resolution_clock::now();
+			prims_using_avl(ptr[1], ptr[0]);
+			auto stop_avl = high_resolution_clock::now(); 
+			auto duration_avl = duration_cast<microseconds>(stop_avl - start_avl); 
+			cout << "Time taken by AVL tree: "<<duration_avl.count()<<" microseconds"<<endl;
+			avl_mst<<j<<" "<<edges_arr[i]<<" "<<duration_avl.count()<<endl;
+			
+			adj_list.clear();
+			bitmap.clear();
+			free(ptr);
+		}
+	}
+	binomial_mst.close();
+	avl_mst.close();
 }
 
 int main() {
@@ -416,36 +506,11 @@ int main() {
 	
     compare_RB_AVL_BINOMIAL();
 	
-	*/
-	int N;
-	cin>>N;
-	int E;
-	cin>>E;
-	adj_list.resize(N);
-	bitmap.resize(N);
-	for(int i=0;i<E;i++) {
-		int v1, v2, w;
-		cin>>v1>>v2>>w;
-		v1--;
-		v2--;
-		pair<int, int> f, s;
-		f.first=v1;
-		f.second=w;
-		s.first=v2;
-		s.second=w;
-		adj_list[v1].push_back(s);
-		adj_list[v2].push_back(f);
-	}
-
-	int start_node;
-	cin>>start_node;
-	start_node--;
-
-	//prims_using_binomial_heap(start_node, N);
+    */
 	
-	//prims_using_avl(start_node, N);
-
-	prims_using_rb(start_node, N);
+	
+	compare_wrt_prims();
+	
 	
 	return 0;
 }
