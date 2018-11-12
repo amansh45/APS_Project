@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 def column(matrix, i):
     return [row[i] for row in matrix]
@@ -54,12 +55,59 @@ for x in action:
     avl_Y[:] = [x / 1000 for x in avl_Y]
     bin_Y[:] = [x / 1000 for x in bin_Y]
     rb_Y[:] = [x / 1000 for x in rb_Y]
-    
-    import matplotlib.pyplot as plt        
-    plt.scatter(avl_X,avl_Y, c='b', marker='o', label='avl_build')
-    plt.scatter(bin_X, bin_Y, c='r', marker='s', label='binomial_build')
-    plt.scatter(rb_X, rb_Y, c='y', marker='o', label='red-black_build')
+            
+    plt.scatter(avl_X,avl_Y, c='b', marker='o', label='avl tree')
+    plt.scatter(bin_X, bin_Y, c='r', marker='s', label='binomial heap')
+    plt.scatter(rb_X, rb_Y, c='y', marker='^', label='red-black tree')
     plt.xlabel('size of input') 
     plt.ylabel('time taken (milli sec)')        
     plt.legend(loc='upper left')
+    if x=="insert":
+        plt.title('Insertion')
+    elif x=="search":
+        plt.title("Search")
+    elif x=="rmin":
+        plt.title("Retrieve Minimum")
+    elif x=="xmin":
+        plt.title("Extract Minimum")
     plt.show()
+    
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+binomial_mst = []
+with open('binomial_mst.txt') as f:
+    for line in f:
+        binomial_list = [int(elt.strip()) for elt in line.split(' ')]
+        binomial_mst.append(binomial_list)
+
+bmstX = column(binomial_mst, 0)
+bmstY = column(binomial_mst, 1)
+bmstZ = column(binomial_mst, 2)
+
+bmstZ[:] = [x / 1000 for x in bmstZ]
+
+
+avl_mst = []
+with open('avl_mst.txt') as f:
+    for line in f:
+        avl_list = [int(elt.strip()) for elt in line.split(' ')]
+        avl_mst.append(avl_list)
+        
+amstX = column(avl_mst, 0)
+amstY = column(avl_mst, 1)
+amstZ = column(avl_mst, 2)
+
+amstZ[:] = [x / 1000 for x in amstZ]
+
+for c, m, t in [('r', 'o', 'avl'), ('b', '^', 'binomial')]:
+    if t=='avl':
+        ax.scatter(amstX, amstY, amstZ, c=c, marker=m, label='avl tree')
+    elif t=='binomial':
+        ax.scatter(bmstX, bmstY, bmstZ, c=c, marker=m, label='binomial heap')
+
+ax.set_xlabel('vertex count')
+ax.set_ylabel('edge count')
+ax.set_zlabel('time taken (milli seconds)')
+plt.title("Minimum Spanning Tree Comparision")
+plt.legend(loc='upper left')
+plt.show()

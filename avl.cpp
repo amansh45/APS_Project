@@ -10,11 +10,13 @@ int max(int a, int b) {
 	return (a > b)? a : b; 
 } 
 
-struct avlNode* newNode(int key) { 
+struct avlNode* newNode(int key, int vid) { 
 	struct avlNode* node = (struct avlNode*) malloc(sizeof(struct avlNode)); 
 	node->key = key; 
+	node->vid = vid;
 	node->left = NULL; 
-	node->right = NULL; 
+	node->right = NULL;
+	node->parent = NULL; 
 	node->height = 1;
 	return(node); 
 } 
@@ -51,15 +53,15 @@ int getBalance(struct avlNode *N) {
 	return height(N->left) - height(N->right); 
 } 
 
-struct avlNode* insert(struct avlNode* node, int key) { 
+struct avlNode* insert(struct avlNode* node, int vid, int key) { 
 	
 	if (node == NULL) 
-		return(newNode(key)); 
+		return(newNode(key, vid)); 
 
 	if (key < node->key) 
-		node->left = insert(node->left, key); 
+		node->left = insert(node->left, vid, key); 
 	else if (key > node->key) 
-		node->right = insert(node->right, key); 
+		node->right = insert(node->right, vid, key); 
 	else
 		return node; 
 
@@ -118,7 +120,9 @@ struct avlNode* deleteNode(struct avlNode* root, int key) {
 		else { 
 			struct avlNode* temp = minValueNode(root->right); 
 
-			root->key = temp->key; 
+			root->key = temp->key;
+			root->parent = temp->parent;
+			root->vid = temp->vid; 
 
 			root->right = deleteNode(root->right, temp->key); 
 		} 
@@ -150,7 +154,7 @@ struct avlNode* deleteNode(struct avlNode* root, int key) {
 	return root; 
 } 
 
-void preOrder(struct avlNode *root) { 
+void preOrder(struct avlNode *root) {
 	if(root != NULL) { 
 		cout<<root->key<<" "; 
 		preOrder(root->left); 
@@ -158,11 +162,13 @@ void preOrder(struct avlNode *root) {
 	} 
 }
 
-int retrieveMinAVL(struct avlNode *root) {
+struct avlNode* retrieveMinAVL(struct avlNode *root) {
+	if(root == NULL)
+		return NULL;
 	if(root->left == NULL)
-		return root->key;
+		return root;
 	else
-		retrieveMinAVL(root->left);
+		return retrieveMinAVL(root->left);
 }
 
 struct avlNode * search_avl(struct avlNode *root, int val) {

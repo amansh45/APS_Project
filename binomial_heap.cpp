@@ -2,11 +2,13 @@
 
 list<struct node *>::iterator merge_trees(list<struct node *>::iterator itr1, list<struct node *>::iterator itr2, list<struct node *> &heap) {
 	if((*itr1)->minimum > (*itr2)->minimum) {
+		(*itr1)->tree_parent = (*itr2);
 		(*itr1)->neighbour = (*itr2)->child;
 		(*itr2)->child = (*itr1);
 		(*itr2)->degree +=1;
 		return itr1;
 	} else {
+		(*itr2)->tree_parent = (*itr1);
 		(*itr2)->neighbour = (*itr1)->child;
 		(*itr1)->child = (*itr2);
 		(*itr1)->degree +=1;
@@ -96,6 +98,8 @@ void modify_heap(list<struct node *> &heap) {
 list<struct node *>::iterator retrieve_min(list<struct node *> &heap) {
 	list<struct node *>::iterator min;
 	int val;
+	if(heap.size() == 0) 
+		return heap.end();
 	for(list <struct node *>::iterator itr=heap.begin();itr!=heap.end();itr++) {
 		if(itr==heap.begin()) 
 			min = itr;
@@ -178,21 +182,47 @@ bool search_binomial(list<struct node *> &heap, int val) {
 
 
 
-void extract_min(list<struct node *> &heap) {
+struct node *extract_min(list<struct node *> &heap) {
 	list<struct node *>::iterator itr = retrieve_min(heap);
 	list<struct node *> another_heap;
 	struct node *child = (*itr)->child;
 	(*itr)->child = NULL;
+	struct node *mini = *itr;
 	heap.erase(itr);
 	
 	while(child!=NULL) {
 		struct node *temp = child->neighbour;
 		child->neighbour = NULL;
+		child->tree_parent=NULL;
 		another_heap.push_front(child);
 		child = temp;
 	}
 
 	list<struct node *> new_heap = union_heap(heap, another_heap);
 	heap = new_heap;
+	return mini;
 }
 
+void adjust_tree_on_change(struct node *ptr, vector<struct node *> &pointers) {
+	struct node *myparent = ptr->tree_parent; 
+   
+    while (myparent != NULL && ptr->minimum < myparent->minimum) { 
+        int temp = ptr->minimum;
+        int tvid = ptr->vid;
+        
+        ptr->minimum = myparent->minimum;
+        ptr->vid = myparent->vid;
+
+        myparent->minimum = temp;
+        myparent->vid = tvid;
+        
+        struct node * swap_parent = ptr->parent;
+        ptr->parent = myparent->parent;
+        myparent->parent = swap_parent;
+
+        pointers[myparent->vid]=myparent;
+        pointers[ptr->vid] = ptr;
+        ptr = myparent; 
+        myparent = myparent->tree_parent; 
+    } 
+}

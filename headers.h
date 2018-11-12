@@ -5,19 +5,22 @@
 #include <random>
 #include <chrono>
 #include <fstream>
+#include <climits>
+#include <set>
 
 using namespace std;
 using namespace std::chrono;
 
 struct node {
-	int minimum, degree;
-	struct node *child, *neighbour;
+	int minimum, degree, vid;
+	struct node *child, *neighbour, *parent, *tree_parent;
 };
 
 struct avlNode { 
-	int key; 
+	int key, vid; 
 	struct avlNode *left; 
-	struct avlNode *right; 
+	struct avlNode *right;
+	struct avlNode *parent; 
 	int height; 
 };
 
@@ -101,13 +104,13 @@ void insert_to_heap(list<struct node *> &, int);
 
 list<struct node *> union_heap(list<struct node *>, list<struct node *>);
 
-void extract_min(list<struct node *> &);
+struct node *extract_min(list<struct node *> &);
 
 int height(struct avlNode *);
 
 int max(int, int);
 
-struct avlNode* newNode(int);
+struct avlNode* newNode(int, int);
 
 struct avlNode *rightRotate(struct avlNode *);
 
@@ -115,7 +118,7 @@ struct avlNode *leftRotate(struct avlNode *);
 
 int getBalance(struct avlNode *);
 
-struct avlNode* insert(struct avlNode*, int);
+struct avlNode* insert(struct avlNode*, int, int);
 
 struct avlNode * minValueNode(struct avlNode*);
 
@@ -129,10 +132,12 @@ void clearBinomial(list<struct node *> &);
 
 void clearBinomialTree(struct node *);
 
-int retrieveMinAVL(struct avlNode *);
+struct avlNode * retrieveMinAVL(struct avlNode *);
 
 struct node *search_binomial_tree(struct node *, int);
 
 bool search_binomial(list <struct node *> &, int);
 
 struct avlNode * search_avl(struct avlNode *, int);
+
+void adjust_tree_on_change(struct node *, vector<struct node *> &);
