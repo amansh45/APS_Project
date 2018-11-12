@@ -279,16 +279,16 @@ rbNode * RBTree::search(int n) {
 	while (temp != NULL) { 
 		if (n < temp->val) { 
 			if (temp->left == NULL) 
-			break; 
+				break; 
 			else
-			temp = temp->left; 
+				temp = temp->left; 
 		} else if (n == temp->val) { 
 			break; 
 		} else { 
 			if (temp->right == NULL) 
-			break; 
+				break; 
 			else
-			temp = temp->right; 
+				temp = temp->right; 
 		} 
 	} 
 	return temp; 

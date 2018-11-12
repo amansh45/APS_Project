@@ -493,12 +493,14 @@ int main() {
 			string command;
 			struct avlNode *root = NULL;
 			cout<<"Enter the command: the valid commands are: insert, retrieve_min, extract_min, search, preorder, clear_tree, clear_screen"<<endl;
+			cout<<"Command: ";
 			cin>>command;  
 			while(command != "exit") {
 				if(command == "insert") {
 					int num;
 					cout<<"Enter the number of elements: ";
 					cin>>num;
+					cout<<"Input elements seperated by space: ";
 					for(int j=0;j<num;j++) {
 						int val;
 						cin>>val;
@@ -550,12 +552,14 @@ int main() {
 			string command;			
 			RBTree tree;
 			cout<<"Enter the command: the valid commands are: insert, retrieve_min, extract_min, search, inorder, level_order, clear_tree, clear_screen, exit"<<endl;
+			cout<<"Command: ";
 			cin>>command;  
 			while(command != "exit") {
 				if(command == "insert") {
 					int num;
 					cout<<"Enter the number of elements: ";
-					cin>>num;  
+					cin>>num;
+					cout<<"Input elements seperated by space: ";  
 					for(int j=0;j<num;j++) {
 						int val;
 						cin>>val;
@@ -567,7 +571,7 @@ int main() {
 					cout<<"Enter the element you want to search: ";
 					cin>>val;
 					rbNode *obj = tree.search(val);
-					if(obj == NULL)
+					if(obj->val != val)
 						cout<<"Element not found!"<<endl;
 					else
 						cout<<"Element found!"<<endl;
@@ -608,12 +612,14 @@ int main() {
 			string command;			
 			list<struct node *> heap;
 			cout<<"Enter the command: the valid commands are: insert, retrieve_min, extract_min, search, view_heap, clear_heap, clear_screen, exit"<<endl;
+			cout<<"Command: ";
 			cin>>command;  
 			while(command != "exit") {
 				if(command == "insert") {
 					int num;
 					cout<<"Enter the number of elements: ";
 					cin>>num;  
+					cout<<"Input elements seperated by space: ";
 					for(int j=0;j<num;j++) {
 						int val;
 						cin>>val;
